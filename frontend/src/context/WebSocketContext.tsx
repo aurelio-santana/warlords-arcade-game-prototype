@@ -55,6 +55,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const socketIdRef = useRef<string | null>(socketId);
   const moveNumberRef = useRef<number | null>(moveNumber);
 
+  const ENABLE_CLIENT_PREDICTION = process.env.REACT_APP_ENABLE_CLIENT_PREDICTION === 'true';
+
   useEffect(() => {
     if (!user) {
       if (socketId) {
@@ -646,18 +648,53 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     webSocketService.send({ type: 'startGame', data });
   }
 
+  // const movePlayer = useCallback((roomId: string, keyPressed: string) => {
+  //   if (!socketId) {
+  //     setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
+  //     console.log('Can\'t move player without a socketId');
+  //     return;
+  //   }
+
+  //   if (!gameState) {
+  //     console.error('Can\'t move player without a gameState');
+  //     return;
+  //   }
+
+  //   const newPosition = movePlayerPredict(gameState, socketId, keyPressed);
+  //   const player = gameState.players[socketId];
+
+  //   if (!player || !newPosition) {
+  //     console.error('Can\'t move player.');
+  //     return;
+  //   }
+
+  //   const newMoveNumber = addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
+  //   console.log("movenumber no move player", newMoveNumber);
+
+
+  //   if (newMoveNumber) {
+  //     const data = { roomId: roomId, keyPressed: keyPressed, moveNumber: newMoveNumber + 1, playerId: socketId }
+  //     webSocketService.send({ type: 'movePlayer', data });
+  //   }
+
+  // }, [socketId, gameState]);
+
   const movePlayer = useCallback((roomId: string, keyPressed: string) => {
-    if (!socketId) {
-      setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
-      console.log('Can\'t move player without a socketId');
-      return;
-    }
+  if (!socketId) {
+    setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
+    console.log('Can\'t move player without a socketId');
+    return;
+  }
 
-    if (!gameState) {
-      console.error('Can\'t move player without a gameState');
-      return;
-    }
+  if (!gameState) {
+    console.error('Can\'t move player without a gameState');
+    return;
+  }
 
+  let newMoveNumber: number | undefined | null = null;
+
+  // Aplica predição apenas se habilitado
+  if (ENABLE_CLIENT_PREDICTION) {
     const newPosition = movePlayerPredict(gameState, socketId, keyPressed);
     const player = gameState.players[socketId];
 
@@ -666,16 +703,20 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return;
     }
 
-    const newMoveNumber = addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
+    newMoveNumber = addMoveOnHistory(newPosition.direction, newPosition.x, newPosition.y);
     console.log("movenumber no move player", newMoveNumber);
+  }
 
+  // Envia o comando para o servidor (com ou sem predição)
+  const data = { 
+    roomId: roomId, 
+    keyPressed: keyPressed, 
+    moveNumber: ENABLE_CLIENT_PREDICTION ? (newMoveNumber || 0) + 1 : 0, 
+    playerId: socketId 
+  };
+  webSocketService.send({ type: 'movePlayer', data });
 
-    if (newMoveNumber) {
-      const data = { roomId: roomId, keyPressed: keyPressed, moveNumber: newMoveNumber + 1, playerId: socketId }
-      webSocketService.send({ type: 'movePlayer', data });
-    }
-
-  }, [socketId, gameState]);
+}, [socketId, gameState]);
 
   const leaveGame = (roomId: string) => {
     if (!socketId) {
