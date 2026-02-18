@@ -281,9 +281,39 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setGameState(data.data.gameState)
     });
 
-    webSocketService.registerCallback('playerMoved', (data) => {
-      //setGameState(data.data.gameState)
+    // webSocketService.registerCallback('playerMoved', (data) => {
+    //   //setGameState(data.data.gameState)
 
+    //   const playerId = data.data.playerId;
+
+    //   if (!playerId) {
+    //     console.log("Erro ao identificar jogador");
+    //     setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
+    //     return;
+    //   }
+
+    //   const serverMovement = data.data.move;
+    //   if (!serverMovement) {
+    //     console.log("Erro ao identificar movimento do jogador");
+    //     setLastMessage({ type: 'error', data: { message: 'Erro ao identificar jogador movimentado. Unexpected server response' } });
+    //     return;
+    //   }
+
+
+    //   if (playerId === socketIdRef.current) {
+    //     validateAndReconcile(data.data.move);
+    //     console.log("reconciliação");
+    //   }
+    //   //else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
+    //   else if (gameState && gameState.players[playerId]) {
+    //     console.log("interpolação");
+    //     updateTarget(data.data.move.x, data.data.move.y, data.data.playerId);
+
+    //   }
+    // });
+
+    // Desativando reconciliação
+    webSocketService.registerCallback('playerMoved', (data) => {
       const playerId = data.data.playerId;
 
       if (!playerId) {
@@ -299,16 +329,23 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         return;
       }
 
-
       if (playerId === socketIdRef.current) {
-        validateAndReconcile(data.data.move);
-        console.log("reconciliação");
-      }
-      //else if (gameStateRef.current && gameStateRef.current.players[playerId]) {
-      else if (gameState && gameState.players[playerId]) {
+        if (ENABLE_CLIENT_PREDICTION) {
+          // Com predição: valida e reconcilia
+          validateAndReconcile(data.data.move);
+          console.log("reconciliação");
+        } else {
+          // Sem predição: apenas atualiza a posição diretamente
+          if (gameState && gameState.players[playerId]) {
+            gameState.players[playerId].x = serverMovement.x;
+            gameState.players[playerId].y = serverMovement.y;
+            console.log("atualização direta (sem predição)");
+          }
+        }
+      } else if (gameState && gameState.players[playerId]) {
+        // Outros jogadores: sempre usa interpolação
         console.log("interpolação");
         updateTarget(data.data.move.x, data.data.move.y, data.data.playerId);
-
       }
     });
 
@@ -679,6 +716,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // }, [socketId, gameState]);
 
+  // Desativando predição
   const movePlayer = useCallback((roomId: string, keyPressed: string) => {
   if (!socketId) {
     setLastMessage({ type: 'error', data: { message: 'Falha ao conectar com o servidor' } });
