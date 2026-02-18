@@ -20,6 +20,8 @@ interface ScreenProps {
 const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const { socketId, roomState, gameState, movePlayer } = useWebSocket();
+	const ENABLE_PLAYER_INTERPOLATION = process.env.REACT_APP_ENABLE_PLAYER_INTERPOLATION === 'true';
+	const ENABLE_BALL_INTERPOLATION = process.env.REACT_APP_ENABLE_BALL_INTERPOLATION === 'true';
 	const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
 	const activeKeysRef = useRef(new Set<string>());
 	const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
@@ -68,7 +70,7 @@ const NewGameScreen: React.FC<ScreenProps> = ({ setScreen, setWinner, roomCode }
 
 
 				// Renderiza apenas se o tempo decorrido for maior que o intervalo desejado
-				renderScreen(canvas, gameStateRef, socketId);
+				renderScreen(canvas, gameStateRef, socketId, ENABLE_PLAYER_INTERPOLATION, ENABLE_BALL_INTERPOLATION);
 				lastRenderTimeRef.current = timestamp;
 
 

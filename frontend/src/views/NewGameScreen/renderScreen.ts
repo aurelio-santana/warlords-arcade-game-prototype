@@ -12,12 +12,19 @@ export default function renderScreen(
   canvasScreen: HTMLCanvasElement,
   gameStateRef: React.MutableRefObject<IGameState | null>,
   currentPlayerId: string,
+  enablePlayerInterpolation: boolean = true,
+  enableBallInterpolation: boolean = true,
 ) {
   const gameState = gameStateRef.current;
   if (!gameState) return;
 
-  interpolateBall(0.5);
-  interpolatePlayer(0.5);
+  // Interpola apenas se habilitado
+  if (enableBallInterpolation) {
+    interpolateBall(0.5);
+  }
+  if (enablePlayerInterpolation) {
+    interpolatePlayer(0.5);
+  }
 
   const context = canvasScreen.getContext('2d');
   if (!context) throw new Error("Could not get 2D context from canvas.");

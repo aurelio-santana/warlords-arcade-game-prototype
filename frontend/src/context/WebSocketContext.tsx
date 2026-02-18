@@ -56,6 +56,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const moveNumberRef = useRef<number | null>(moveNumber);
 
   const ENABLE_CLIENT_PREDICTION = process.env.REACT_APP_ENABLE_CLIENT_PREDICTION === 'true';
+  const ENABLE_PLAYER_INTERPOLATION = process.env.REACT_APP_ENABLE_PLAYER_INTERPOLATION === 'true';
+  const ENABLE_BALL_INTERPOLATION = process.env.REACT_APP_ENABLE_BALL_INTERPOLATION === 'true';
 
   useEffect(() => {
     if (!user) {
@@ -806,8 +808,15 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!player) return;
 
-      player.toX = x;
-      player.toY = y;
+      // Só define toX e toY se interpolação de jogadores estiver habilitada
+      if (ENABLE_PLAYER_INTERPOLATION) {
+        player.toX = x;
+        player.toY = y;
+      } else {
+        // Sem interpolação: atualiza diretamente
+        player.x = x;
+        player.y = y;
+      }
 
     } else {
       setGameState(prevGameState => {
@@ -821,14 +830,28 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             info: initialInfoState
           };
         }
-        return {
-          ...prevGameState,
-          ball: {
-            ...prevGameState.ball,
-            toX: x,
-            toY: y,
-          },
-        };
+        
+        // Só define toX e toY se interpolação da bola estiver habilitada
+        if (ENABLE_BALL_INTERPOLATION) {
+          return {
+            ...prevGameState,
+            ball: {
+              ...prevGameState.ball,
+              toX: x,
+              toY: y,
+            },
+          };
+        } else {
+          // Sem interpolação: atualiza diretamente
+          return {
+            ...prevGameState,
+            ball: {
+              ...prevGameState.ball,
+              x: x,
+              y: y,
+            },
+          };
+        }
       });
     }
   }
