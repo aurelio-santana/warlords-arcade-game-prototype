@@ -89,7 +89,7 @@ export const Register: React.FC = () => {
           >
             Registrar
           </button>
-          <LoginGoogleButton />
+          {/* <LoginGoogleButton /> */}
           <div id="text-div">
             <h2 className="text">
               Já possui uma conta? 

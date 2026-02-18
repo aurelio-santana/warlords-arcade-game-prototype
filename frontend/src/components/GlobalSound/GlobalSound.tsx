@@ -28,7 +28,7 @@ export const GlobalSound: React.FC<GlobalSoundProps> = ({ currentScreen }) => {
           gameAudio.startBackgroundMusic();
           gameAudio.saveAudioState();
         }
-      } else if (location.pathname === '/monolito' && currentScreen !== 'game-over') {
+      } else if (location.pathname === '/play' && currentScreen !== 'game-over') {
         // Tocar música da home se o jogador estiver no menu principal
         if (!gameAudio.isPlayingHomeMusic) {
           gameAudio.stopAll();

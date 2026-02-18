@@ -50,7 +50,7 @@ export const Login: React.FC = () => {
 
       if (data) {
         setUser(data as User);
-        navigate('/monolito');
+        navigate('/play');
       }
     } catch (err) {
       console.error('Erro ao conectar à API:', err);
@@ -89,7 +89,7 @@ export const Login: React.FC = () => {
         >
           Entrar
         </button>
-        <LoginGoogleButton />
+        {/* <LoginGoogleButton /> */}
         <div id="text-div">
           <h2 className="text">
             Não possui uma conta?

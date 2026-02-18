@@ -3,7 +3,6 @@ module.exports = {
         {
             name: 'jogo-atari-server',
             script: 'dist/index.js',
-            interpreter: 'ts-node',
             instances: 1,
             autorestart: true,
             watch: false,

@@ -24,7 +24,7 @@ const LoginGoogleButton: React.FC = () => {
 
                 if (data) {
                     setUser(data.data as User);
-                    navigate('/monolito');
+                    navigate('/play');
               
                   } else {
                     console.error("Erro na autenticação:", data.error);

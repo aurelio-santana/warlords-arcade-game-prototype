@@ -12,26 +12,26 @@ import { ToastContainer } from 'react-toastify';
 import RedirectRoute from './components/RedirectRoute/RedirectRoute';
 
 function App() {
-  const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+  // const clientId = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 
-  if (!clientId) {
-    throw new Error("REACT_APP_GOOGLE_CLIENT_ID is not defined in .env file");
-  }
+  // if (!clientId) {
+  //   throw new Error("REACT_APP_GOOGLE_CLIENT_ID is not defined in .env file");
+  // }
 
   return (
-    <GoogleOAuthProvider clientId={clientId}>
+    // <GoogleOAuthProvider clientId={clientId}>
       <UserProvider>
         <WebSocketProvider>
           <Router>
             <Routes>
               <Route path='/' element={<RedirectRoute children={<Login />} />} />
               <Route path='/register' element={<Register />} />
-              <Route path="/monolito" element={<ProtectedRoute children={<GameMonolito />} />} />
+              <Route path="/play" element={<ProtectedRoute children={<GameMonolito />} />} />
             </Routes>
           </Router>
         </WebSocketProvider>
       </UserProvider>
-    </GoogleOAuthProvider>
+    // </GoogleOAuthProvider>
   );
 }
 

@@ -7,7 +7,7 @@ const RedirectRoute = ({ children }: { children: JSX.Element }) => {
 
   if (loading) return <div>Loading...</div>;
 
-  return user ? <Navigate to="/monolito" /> : children;
+  return user ? <Navigate to="/play" /> : children;
 };
 
 export default RedirectRoute;
