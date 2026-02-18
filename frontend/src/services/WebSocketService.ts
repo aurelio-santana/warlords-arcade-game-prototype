@@ -7,7 +7,7 @@ class WebSocketService {
 
   connect() {
     if (!this.socket || this.socket.readyState === WebSocket.CLOSED) {
-      this.socket = new WebSocket(`ws://localhost:3001`);
+      this.socket = new WebSocket(`ws://${process.env.REACT_APP_DOMAIN_ADDRESS}/ws`);
 
       this.socket.onopen = () => {
         console.log("Conexão WebSocket estabelecida.");
